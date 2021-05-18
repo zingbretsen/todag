@@ -1,6 +1,4 @@
 import React from 'react'
-import { useRef, useState } from 'react'
-import VisNetworkReactComponent from "vis-network-react";
 
 import { withStyles, createStyles, Theme } from '@material-ui/core/styles'
 import {
@@ -64,24 +62,6 @@ function ProjectList(props: any) {
   const [rowsPerPage] = React.useState(10)
   const [filterState, setFilterState] = React.useState({ projectnameFilter: '' })
 
-  const [ graphdata, setGraphdata ] = useState( {
-    nodes: [
-      { id: 1, label: "Node 1" },
-      { id: 2, label: "Node 2" },
-      { id: 3, label: "Node 3" },
-      { id: 4, label: "Node 4" },
-      { id: 5, label: "Node 5" },
-    ],
-    edges: [
-      { from: 1, to: 3 },
-      { from: 1, to: 2 },
-      { from: 2, to: 4 },
-      { from: 2, to: 5 },
-      { from: 3, to: 3 },
-    ]
-  } );
-
-
   const getFilter = () => {
     return filterState.projectnameFilter.length > 0
       ? { name_CONTAINS: filterState.projectnameFilter }
@@ -139,10 +119,6 @@ function ProjectList(props: any) {
       {error && !loading && <p>Error</p>}
       {data && !loading && !error && (
           <>
-              <VisNetworkReactComponent
-                  data={graphdata}
-                  options={{}}
-              />
         <Table className={classes.table}>
           <TableHead>
             <TableRow>
