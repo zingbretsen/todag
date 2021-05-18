@@ -30,7 +30,15 @@ const driver = neo4j.driver(
  * https://neo4j.com/docs/graphql-manual/current/
  */
 
-const neoSchema = new Neo4jGraphQL({ typeDefs, driver })
+const resolvers = {
+  Project: {
+    numTodos(obj) {
+      return obj.numTodos.low
+    },
+  },
+}
+
+const neoSchema = new Neo4jGraphQL({ typeDefs, driver, resolvers })
 
 /*
  * Create a new ApolloServer instance, serving the GraphQL schema
