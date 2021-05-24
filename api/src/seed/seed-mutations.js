@@ -1,90 +1,88 @@
-const fetch = require('node-fetch')
+const { readFileSync } = require('fs')
+
 const parse = require('csv-parse/lib/sync')
 const { gql } = require('@apollo/client')
 
-export const getSeedMutations = async () => {
-  const res = await fetch(
-    'https://cdn.neo4jlabs.com/data/grandstack_businesses.csv'
-  )
-  const body = await res.text()
-  const records = parse(body, { columns: true })
-  const mutations = generateMutations(records)
+const definitions = [
+  {
+    query: gql`
+      mutation mergeProjects($projectId: ID!, $name: String!) {
+        Project: mergeProject(projectId: $projectId, name: $name) {
+          projectId
+          name
+        }
+      }
+    `,
+    filename: './src/seed/data/projects.csv',
+  },
+  {
+    query: gql`
+      mutation mergeUsers($userId: ID!, $name: String!) {
+        User: mergeUser(userId: $userId, name: $name) {
+          userId
+          name
+        }
+      }
+    `,
+    filename: './src/seed/data/users.csv',
+  },
+  {
+    query: gql`
+      mutation mergeTodos($todoId: ID!, $name: String!, $description: String) {
+        Todo: mergeTodo(
+          todoId: $todoId
+          name: $name
+          description: $description
+        ) {
+          todoId
+          name
+          description
+        }
+      }
+    `,
+    filename: './src/seed/data/todos.csv',
+  },
+  {
+    query: gql`
+      mutation mergeProjectDependencies($projectId: ID!, $todoId: ID!) {
+        Project: mergeProjectDependency(
+          projectId: $projectId
+          todoId: $todoId
+        ) {
+          projectId
+        }
+      }
+    `,
+    filename: './src/seed/data/project_dependencies.csv',
+  },
+  {
+    query: gql`
+      mutation mergeTodoDependencies($todoId1: ID!, $todoId2: ID!) {
+        Todo: mergeTodoDependency(todoId1: $todoId1, todoId2: $todoId2) {
+          todoId
+        }
+      }
+    `,
+    filename: './src/seed/data/todo_dependencies.csv',
+  },
+]
 
+const whatever = ({ query, filename }) => {
+  let data = readFileSync(filename)
+  const records = parse(data, { columns: true })
+  console.log(records)
+  const mutations = generateMutations(query, records)
   return mutations
 }
 
-const generateMutations = (records) => {
+export const getSeedMutations = async () => {
+  return definitions.map((definition) => whatever(definition))
+}
+
+const generateMutations = (query, records) => {
   return records.map((rec) => {
-    Object.keys(rec).map((k) => {
-      if (k === 'latitude' || k === 'longitude' || k === 'reviewStars') {
-        rec[k] = parseFloat(rec[k])
-      } else if (k === 'reviewDate') {
-        const dateParts = rec[k].split('-')
-        rec['year'] = parseInt(dateParts[0])
-        rec['month'] = parseInt(dateParts[1])
-        rec['day'] = parseInt(dateParts[2])
-      } else if (k === 'categories') {
-        rec[k] = rec[k].split(',')
-      }
-    })
-
     return {
-      mutation: gql`
-        mutation mergeReviews(
-          $userId: ID!
-          $userName: String!
-          $businessId: ID!
-          $businessName: String!
-          $businessCity: String!
-          $businessState: String!
-          $businessAddress: String!
-          $latitude: Float!
-          $longitude: Float!
-          $reviewId: ID!
-          $reviewText: String
-          $reviewDate: Date
-          $reviewStars: Float
-          $categories: [String!]!
-        ) {
-          user: mergeUser(userId: $userId, name: $userName) {
-            userId
-          }
-          business: mergeBusiness(
-            businessId: $businessId
-            name: $businessName
-            address: $businessAddress
-            city: $businessCity
-            state: $businessState
-            latitude: $latitude
-            longitude: $longitude
-          ) {
-            businessId
-          }
-
-          businessCategories: mergeBusinessCategory(
-            categories: $categories
-            businessId: $businessId
-          ) {
-            businessId
-          }
-
-          reviews: createReviews(
-            input: {
-              reviewId: $reviewId
-              stars: $reviewStars
-              text: $reviewText
-              date: $reviewDate
-              business: { connect: { where: { businessId: $businessId } } }
-              user: { connect: { where: { userId: $userId } } }
-            }
-          ) {
-            reviews {
-              reviewId
-              date
-            }
-          }
-        }
-      `,
+      mutation: query,
       variables: rec,
     }
   })

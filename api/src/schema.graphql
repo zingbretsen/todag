@@ -6,11 +6,12 @@ scalar DateTime
 scalar PointInput
 
 type Todo {
-  id: ID!
+  todoId: ID!
   name: String!
   project: [Project] @relationship(type: "DEPENDS_ON", direction: IN)
   label: [String]
   identity: Int
+  description: String
   # blocker: [Todo] @relationship(type: "BLOCKS", direction: IN)
 }
 
@@ -29,15 +30,26 @@ type Project {
   projectId: ID!
   name: String!
   depends_on: [Todo] @relationship(type: "DEPENDS_ON", direction: OUT)
-  numTodos: Int
-    @cypher(statement: "MATCH (this)-[:DEPENDS_ON]->(n:TODO) RETURN COUNT(n)")
-  # path: [Path]
-  #   @cypher(statement: "MATCH p=(this) -[:DEPENDS_ON]-> (m:Todo) return p")
+
   subgraph: Graph
-    @cypher(statement: "MATCH p=(this) -[:DEPENDS_ON *]-> (m:Todo) WITH apoc.agg.graph(p) AS g RETURN g")
-    # @cypher(statement: "MATCH p=(this) -[:DEPENDS_ON]-> (m:Todo) return m")
-    # @cypher(statement: "MATCH p=(n:Todo) -[:DEPENDS_ON *]-> (m:Todo) where n.id='2' return nodes(p)")
-    # @cypher(statement: "MATCH p=(n:Todo) where n.id='1' RETURN n")
+    @cypher(statement: """
+    MATCH p=(this) -[:DEPENDS_ON *]-> (m:Todo)
+    WITH apoc.agg.graph(p) AS g
+    RETURN g
+    """)
+
+  nextActions: [Todo]
+    @cypher(statement: """
+    MATCH (this) -[:DEPENDS_ON *]-> (m:Todo)
+    where not (m) -[:DEPENDS_ON *]-> (:Todo)
+    return distinct(m)
+    """)
+
+  numTodos: Int
+    @cypher(statement: """
+    MATCH (this) -[:DEPENDS_ON *]-> (m:Todo)
+    return count(distinct(m))
+    """)
 }
 
 type User {
@@ -90,40 +102,6 @@ type RatingCount @exclude {
   count: Int!
 }
 
-type Mutation {
-  mergeBusinessCategory(categories: [String!]!, businessId: ID!): Business
-    @cypher(
-      statement: "MATCH (b:Business {businessId: $businessId}) UNWIND $categories AS cat MERGE (c:Category {name: cat}) MERGE (b)-[:IN_CATEGORY]->(c) RETURN b"
-    )
-  mergeUser(name: String!, userId: ID!): User
-    @cypher(
-      statement: """
-      MERGE (u:User {userId: $userId})
-      ON CREATE SET u.name = $name
-      """
-    )
-  mergeBusiness(
-    businessId: ID!
-    name: String!
-    address: String!
-    city: String!
-    state: String!
-    latitude: Float!
-    longitude: Float!
-  ): Business
-    @cypher(
-      statement: """
-      MERGE (b:Business {businessId: $businessId})
-      ON CREATE SET b.name = $name,
-                    b.address = $address,
-                    b.city = $city,
-                    b.state = $state,
-                    b.location = Point({latitude: $latitude, longitude: $longitude})
-      RETURN b
-      """
-    )
-}
-
 type Query {
   todoCount: Int! @cypher(statement: "MATCH (n:Todo) RETURN COUNT(n)")
   projectCount: Int! @cypher(statement: "MATCH (n:Project) RETURN COUNT(n)")
@@ -131,10 +109,46 @@ type Query {
     @cypher(
       statement: "MATCH (r:Review) WITH r.stars AS stars, COUNT(*) AS count ORDER BY stars RETURN {stars: stars, count: count}"
     )
+  nodes: [Todo]
+    @cypher(statement: "MATCH p=(n:Todo) -[:DEPENDS_ON *]-> (m:Todo) WITH apoc.agg.graph(p) AS g RETURN g.nodes")
 }
 
-type Query {
-  
-  nodes: [Todo]
-  @cypher(statement: "MATCH p=(n:Todo) -[:DEPENDS_ON *]-> (m:Todo) WITH apoc.agg.graph(p) AS g RETURN g.nodes")
+type Mutation {
+  mergeUser(name: String!, userId: ID!): User
+    @cypher(statement: """
+      MERGE (u:User {userId: $userId})
+      ON CREATE SET u.name = $name
+      RETURN u
+      """
+    )
+  mergeProject(name: String!, projectId: ID!): Project
+    @cypher(statement: """
+      MERGE (p:Project {projectId: $projectId})
+      ON CREATE SET p.name = $name
+      RETURN p
+      """
+    )
+  mergeTodo(name: String!, todoId: ID!, description: String): Todo
+    @cypher(statement: """
+      MERGE (t:Todo {todoId: $todoId})
+      ON CREATE SET t.name = $name, t.description = $description
+      RETURN t
+      """
+  )
+  mergeProjectDependency(projectId: ID!, todoId: ID!): Project
+  @cypher(statement: """
+    MERGE (p:Project {projectId: $projectId})
+    MERGE (t:Todo {todoId: $todoId})
+    MERGE (p) -[:DEPENDS_ON]-> (t)
+    RETURN p
+    """
+  )
+  mergeTodoDependency(todoId1: ID!, todoId2: ID!): Todo
+  @cypher(statement: """
+    MERGE (t1:Todo {todoId: $todoId1})
+    MERGE (t2:Todo {todoId: $todoId2})
+    MERGE (t1) -[:DEPENDS_ON]-> (t2)
+    RETURN t1
+    """
+  )
 }
