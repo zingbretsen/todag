@@ -19,18 +19,23 @@ const client = new ApolloClient({
 })
 
 const runMutations = async () => {
-  const mutations = await getSeedMutations()
+  const mutationGroups = await getSeedMutations()
 
   return Promise.all(
-    mutations.map(({ mutation, variables }) => {
-      return client
-        .mutate({
-          mutation,
-          variables,
+    mutationGroups.map((mutations) => {
+      console.log('asdf')
+      return Promise.all(
+        mutations.map(({ mutation, variables }) => {
+          return client
+            .mutate({
+              mutation,
+              variables,
+            })
+            .catch((e) => {
+              throw new Error(e)
+            })
         })
-        .catch((e) => {
-          throw new Error(e)
-        })
+      )
     })
   )
 }
