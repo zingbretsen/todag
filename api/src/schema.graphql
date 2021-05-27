@@ -1,9 +1,12 @@
 scalar Path
 scalar Node
 scalar Relationship
-scalar Point
-scalar DateTime
-scalar PointInput
+
+type Context {
+  todoId: ID!
+  name: String!
+  todo: [Todo] @relationship(type: "Contains", direction: OUT)
+}
 
 type Todo {
   todoId: ID!
@@ -12,7 +15,6 @@ type Todo {
   label: [String]
   identity: Int
   description: String
-  # blocker: [Todo] @relationship(type: "BLOCKS", direction: IN)
 }
 
 type Properties {
@@ -21,7 +23,6 @@ type Properties {
 }
 
 type Graph {
-  # id: Int
   nodes: [Node]
   relationships: [Relationship]
 }
@@ -40,8 +41,8 @@ type Project {
 
   nextActions: [Todo]
     @cypher(statement: """
-    MATCH (this) -[:DEPENDS_ON *]-> (m:Todo)
-    where not (m) -[:DEPENDS_ON *]-> (:Todo)
+    MATCH (this) -[:DEPENDS_ON *]-> (m)
+    where not (m) -[:DEPENDS_ON *]-> ()
     return distinct(m)
     """)
 
@@ -55,17 +56,6 @@ type Project {
 type User {
   userId: ID!
   name: String
-  reviews: [Review] @relationship(type: "WROTE", direction: OUT)
-  avgStars: Float
-    @cypher(
-      statement: "MATCH (this)-[:WROTE]->(r:Review) RETURN toFloat(avg(r.stars))"
-    )
-  numReviews: Int
-    @cypher(statement: "MATCH (this)-[:WROTE]->(r:Review) RETURN COUNT(r)")
-  recommendations(first: Int = 3): [Business]
-    @cypher(
-      statement: "MATCH (this)-[:WROTE]->(r:Review)-[:REVIEWS]->(:Business)<-[:REVIEWS]-(:Review)<-[:WROTE]-(:User)-[:WROTE]->(:Review)-[:REVIEWS]->(rec:Business) WHERE NOT EXISTS( (this)-[:WROTE]->(:Review)-[:REVIEWS]->(rec) ) WITH rec, COUNT(*) AS num ORDER BY num DESC LIMIT $first RETURN rec"
-    )
 }
 
 type Business {
@@ -137,16 +127,16 @@ type Mutation {
   )
   mergeProjectDependency(projectId: ID!, todoId: ID!): Project
   @cypher(statement: """
-    MERGE (p:Project {projectId: $projectId})
-    MERGE (t:Todo {todoId: $todoId})
+    MATCH (p:Project {projectId: $projectId})
+    MATCH (t:Todo {todoId: $todoId})
     MERGE (p) -[:DEPENDS_ON]-> (t)
     RETURN p
     """
   )
   mergeTodoDependency(todoId1: ID!, todoId2: ID!): Todo
   @cypher(statement: """
-    MERGE (t1:Todo {todoId: $todoId1})
-    MERGE (t2:Todo {todoId: $todoId2})
+    MATCH (t1:Todo {todoId: $todoId1})
+    MATCH (t2:Todo {todoId: $todoId2})
     MERGE (t1) -[:DEPENDS_ON]-> (t2)
     RETURN t1
     """
