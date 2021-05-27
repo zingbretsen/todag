@@ -47,7 +47,7 @@ const GET_PROJECT = gql`
       where: $filter
     ) {
       name
-      depends_on {
+      nextActions {
         name
       }
     }
@@ -98,6 +98,7 @@ function ProjectList(props: any) {
     }))
   }
 
+
   return (
     <>
         <Paper className={classes.root}>
@@ -117,47 +118,51 @@ function ProjectList(props: any) {
       />
       {loading && !error && <p>Loading...</p>}
       {error && !loading && <p>Error</p>}
-      {data && !loading && !error && (
-          <>
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <TableCell
-                key="name"
-                sortDirection={orderBy === 'name' ? order : false}
-              >
-                <Tooltip title="Sort" placement="bottom-start" enterDelay={300}>
-                  <TableSortLabel
-                    active={orderBy === 'name'}
-                    direction={order}
-                    onClick={() => handleSortRequest('name')}
-                  >
-                    Name
-                  </TableSortLabel>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.projects.map((n: any) => {
-              return n.depends_on.map((m: any) => {
-                return (
-                  <TableRow key={n.id + m.name}>
-                    <TableCell component="th" scope="row">
-                      {n.name}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {m.name}
-                    </TableCell>
-                  </TableRow>
-                )
-              })
-            })}
-          </TableBody>
-        </Table>
-</>      )}
-    </Paper>
-    </>
+      {data && !loading && !error && <> {
+              data.projects.map((n: any) => {
+                  return (
+                      <div key={n.id}>
+                          <h2>{n.name}</h2>
+                      <Table className={classes.table}>
+                          <TableHead>
+                              <TableRow>
+                                  <TableCell
+                                      key="name"
+                                      sortDirection={orderBy === 'name' ? order : false}
+                                  >
+                                      <Tooltip title="Sort" placement="bottom-start" enterDelay={300}>
+                                          <TableSortLabel
+                                              active={orderBy === 'name'}
+                                              direction={order}
+                                              onClick={() => handleSortRequest('name')}
+                                          >
+                                              Name
+                                          </TableSortLabel>
+                                      </Tooltip>
+                                  </TableCell>
+                              </TableRow>
+                          </TableHead>
+                          <TableBody>
+                              {n.nextActions.map((m: any) => {
+                                      return (
+                                          <TableRow key={n.id + m.name}>
+                                              <TableCell component="th" scope="row">
+                                                  {m.name}
+                                              </TableCell>
+                                          </TableRow>
+                                      )
+                                  })
+                              }
+                          </TableBody>
+                      </Table>
+                      </div>
+                  )
+              }
+              )
+      } </>
+      }
+      </Paper>
+      </>
   )
 }
 
