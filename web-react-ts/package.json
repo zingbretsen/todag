@@ -8,6 +8,8 @@
     "@material-ui/icons": "^4.9.1",
     "@types/cytoscape": "^3.14.14",
     "cytoscape": "^3.18.2",
+    "d3": "*",
+    "d3-dag": "*",
     "moment": "^2.29.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -27,6 +29,7 @@
     "@types/react-dom": "^16.9.0",
     "@types/react-router-dom": "^5.1.5",
     "@types/recharts": "^1.8.14",
+    "eslint-plugin-import": "^*",
     "typescript": "~3.7.2"
   },
   "scripts": {

@@ -12,6 +12,7 @@ import {
 import { useQuery, gql } from '@apollo/client'
 
 import Title from './Title'
+import D3test from './D3test'
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -103,6 +104,7 @@ function ProjectList(props: any) {
                 return (
                     <div key={n.id}>
                         <h2>{n.name}</h2>
+                        <D3test />
                         <Table className={classes.table}>
                             <TableBody>
                                 {n.nextActions.map((m: any) => {
