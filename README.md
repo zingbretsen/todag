@@ -56,41 +56,6 @@ npm run seedDb
 ### 4. Open In Browser
 Navigate to http://localhost:3000 to open the web frontend or http://localhost:4001/graphql to open the graphql playground.
 
-### [`/web-react`](./web-react)
-
-![](img/grandstack-app.png)
-
-The frontend React web application is found in this directory.
-
-It includes:
-
-- Material UI
-- React router
-- Apollo Client / React Hooks
-- Create React App
-
-### [`/web-angular`](./web-angular)
-
-![](web-angular/img/angular-ui.jpg)
-
-A UI built with [Angular](https://angular.io), [Apollo](https://www.apollographql.com/docs/angular/) and the [Clarity Design System](https://clarity.design) is also available.
-
-_Start the Angular UI server_
-
-```
-cd ./web-angular && npm start
-```
-
-### [`/mobile_client_flutter`](./mobile_client_flutter)
-
-![](img/grandstack-flutter.png)
-
-A mobile client built with [Flutter](https://flutter.dev) which supports Android, iOS, and web. See the [README](./mobile_client_flutter/README.md) for detailed setup instructions.
-
-```
-cd ./mobile_client_flutter && flutter run
-```
-
 ### [`/web-react-ts`](./web-react-ts)
 
 A UI built with [CRA](https://reactjs.org/docs/create-a-new-react-app.html)
