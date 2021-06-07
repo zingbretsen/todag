@@ -19,15 +19,6 @@ Node dependencies need to be installed at the root, in the api/ directory, and i
 
 Run `npm run installAll` which will run `npm install` in each of those locations.
 
-You also need to install the following packages globally:
-
-- `react-scripts`
-- `nodemon`
-
-You can run `npm i -g react-scripts nodemon`.
-
-If you get a permissions error try running with `sudo`.
-
 ### 2. Start the application
 
 Add the following information in a file called .env in the api/ directory. Change the values to match your Neo4j instance:
