@@ -1,4 +1,5 @@
 # toDAG
+
 The todo ~~list~~ graph app.
 
 ### 1. Create A Neo4j Instance
@@ -11,6 +12,21 @@ docker-compose up --build neo4j
 ```
 
 Navigate to [http://localhost:7474/](http://localhost:7474/) and sign in with the username and password `neo4j` and `neo4j`. It will prompt you to set a new password. Enter that password in the api/.env file per the instructions below.
+
+### 2. Install Dependencies
+
+Node dependencies need to be installed at the root, in the api/ directory, and in the web-react-ts/ directory.
+
+Run `npm run installAll` which will run `npm install` in each of those locations.
+
+You also need to install the following packages globally:
+
+- `react-scripts`
+- `nodemon`
+
+You can run `npm i -g react-scripts nodemon`.
+
+If you get a permissions error try running with `sudo`.
 
 ### 2. Start the application
 
@@ -54,6 +70,7 @@ npm run seedDb
 ```
 
 ### 4. Open In Browser
+
 Navigate to http://localhost:3000 to open the web frontend or http://localhost:4001/graphql to open the graphql playground.
 
 ### [`/web-react-ts`](./web-react-ts)
