@@ -10,7 +10,7 @@ cd neo4j
 docker-compose up --build neo4j
 ```
 
-Navigate to [http://192.168.1.18:7474/](http://192.168.1.18:7474/) and sign in with the username and password `neo4j` and `neo4j`. It will prompt you to set a new password. Enter that password in the api/.env file per the instructions below.
+Navigate to [http://localhost:7474/](http://localhost:7474/) and sign in with the username and password `neo4j` and `neo4j`. It will prompt you to set a new password. Enter that password in the api/.env file per the instructions below.
 
 ### 2. Start the application
 
