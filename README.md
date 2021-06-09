@@ -2,6 +2,16 @@
 
 The todo ~~list~~ graph app.
 
+## What is toDag
+
+This is a tool that will allow you to organize your projects and todo items as a graph rather than a list.
+
+A graph is a data structure that encodes relationships between items, and we believe that this is the best way to organize your projects.
+
+Todo lists don't tell you which items need to be done before others, but a graph can make it clear what the dependencies are within your 
+
+## Setup
+
 ### 1. Create A Neo4j Instance
 
 You should be able to run the community edition of Neo4j in Docker (with APOC enabled) with the following:
