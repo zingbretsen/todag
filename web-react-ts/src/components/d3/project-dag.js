@@ -84,31 +84,6 @@ let d3Chart = {
     // in this example there is nothing to do
     console.log('destroying el')
   },
-
-  _drawPoints: function (el, data) {
-    const g = d3.select(el).selectAll('.d3-points')
-
-    const point = g.selectAll('.d3-point').data(data, (d) => d.id)
-
-    point
-      .enter()
-      .append('circle')
-      .merge(point)
-      .attr('class', 'd3-point')
-      .transition()
-      .duration(2000)
-      .attr('cx', function (d) {
-        return d.x * 3
-      })
-      .attr('cy', function (d) {
-        return d.y
-      })
-      .attr('r', function (d) {
-        return d.z
-      })
-
-    point.exit().remove()
-  },
 }
 
 export default d3Chart
