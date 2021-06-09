@@ -1,5 +1,4 @@
 import * as d3 from 'd3'
-import dag from 'd3-dag'
 
 let d3Chart = {
   create: function (el, props, state) {
@@ -10,23 +9,19 @@ let d3Chart = {
       .attr('class', 'd3')
       .attr('width', width)
       .attr('height', height)
-      .append('defs') // For gradients
   },
 
-  update: function (el, state) {
+  update: function (el, state, nodemap) {
     // Re-compute the scales, and render the data points
     // const scales = this._scales(el, state.domain)
     const svg = d3.select(el).select('svg')
-    console.log(svg)
     const { dag } = state
-    console.log(dag)
     const steps = dag.size()
-    const nodeRadius = 3
+    const nodeRadius = 6
     const interp = d3.interpolateRainbow
     const colorMap = {}
-    const defs = svg.select('defs')
     const scalingFactor = 180
-    const scale = d3.scaleLinear().domain([0, 2.5]).range([0, scalingFactor])
+    const scale = d3.scaleLinear().domain([0, 5]).range([0, scalingFactor])
     for (const [i, node] of dag.idescendants().entries()) {
       colorMap[node.id] = interp(i / steps)
     }
@@ -35,7 +30,7 @@ let d3Chart = {
     const line = d3
       .line()
       .curve(d3.curveCatmullRom)
-      .x((d) => scale(d.x))
+      .x((d) => scale(d.x) * 3)
       .y((d) => scale(d.y))
 
     // Plot edges
@@ -57,7 +52,10 @@ let d3Chart = {
       .data(dag.descendants())
       .enter()
       .append('g')
-      .attr('transform', ({ x, y }) => `translate(${scale(x)}, ${scale(y)})`)
+      .attr(
+        'transform',
+        ({ x, y }) => `translate(${scale(x) * 3}, ${scale(y)})`
+      )
 
     // Plot node circles
     nodes
@@ -65,39 +63,12 @@ let d3Chart = {
       .attr('r', nodeRadius)
       .attr('fill', (n) => colorMap[n.id])
 
-    // const arrow = d3
-    //   .symbol()
-    //   .type(d3.symbolTriangle)
-    //   .size((nodeRadius * nodeRadius) / 5.0)
-    // svg
-    //   .append('g')
-    //   .selectAll('path')
-    //   .data(dag.links())
-    //   .enter()
-    //   .append('path')
-    //   .attr('d', arrow)
-    //   .attr('transform', ({ source, target, points }) => {
-    //     const [end, start] = points.slice().reverse()
-    //     // This sets the arrows the node radius (20) + a little bit (3) away from the node center, on the last line segment of the edge. This means that edges that only span ine level will work perfectly, but if the edge bends, this will be a little off.
-    //     const dx = start.x - end.x
-    //     const dy = start.y - end.y
-    //     const scale = (nodeRadius * 1.15) / Math.sqrt(dx * dx + dy * dy)
-    //     // This is the angle of the last line segment
-    //     const angle = (Math.atan2(-dy, -dx) * 180) / Math.PI + 90
-    //     console.log(angle, dx, dy)
-    //     return `translate(${end.x + dx * scale}, ${
-    //       end.y + dy * scale
-    //     }) rotate(${angle})`
-    //   })
-    //   .attr('fill', ({ target }) => colorMap[target.id])
-    //   .attr('stroke', 'white')
-    //   .attr('stroke-width', 1.5)
-
-    // Add text to nodes
-    nodes
-      .append('text')
+      // Add text to nodes
+      // nodes
+      .append('title')
       // .text((d) => d.id)
-      .text((d) => 'asdf')
+      .text((d) => nodemap[d.data.id].name)
+      .attr('class', 'tooltip')
       .attr('font-weight', 'bold')
       .attr('font-family', 'sans-serif')
       .attr('text-anchor', 'middle')
@@ -127,7 +98,7 @@ let d3Chart = {
       .transition()
       .duration(2000)
       .attr('cx', function (d) {
-        return d.x
+        return d.x * 3
       })
       .attr('cy', function (d) {
         return d.y
