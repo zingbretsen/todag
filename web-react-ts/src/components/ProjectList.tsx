@@ -52,9 +52,9 @@ const GET_PROJECT = gql`
 
 function ProjectList(props: any) {
   const { classes } = props
-  const [page] = React.useState(0)
-  const [rowsPerPage] = React.useState(10)
-  const [filterState, setFilterState] = React.useState({
+  const [page] = useState(0)
+  const [rowsPerPage] = useState(10)
+  const [filterState, setFilterState] = useState({
     projectnameFilter: '',
   })
 
