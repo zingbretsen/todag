@@ -70,7 +70,6 @@ const definitions = [
 const whatever = ({ query, filename }) => {
   let data = readFileSync(filename)
   const records = parse(data, { columns: true })
-  console.log(records)
   const mutations = generateMutations(query, records)
   return mutations
 }
