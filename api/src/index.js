@@ -47,7 +47,6 @@ const server = new ApolloServer({
   introspection: true,
   playground: true,
 })
-console.log(neoSchema.schema)
 
 // Specify host, port and path for GraphQL endpoint
 const port = process.env.GRAPHQL_SERVER_PORT || 4001
