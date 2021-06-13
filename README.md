@@ -2,6 +2,16 @@
 
 The todo ~~list~~ graph app.
 
+## What is toDag
+
+This is a tool that will allow you to organize your projects and todo items as a graph rather than a list.
+
+A graph is a data structure that encodes relationships between items, and we believe that this is the best way to organize your projects.
+
+Todo lists don't tell you which items need to be done before others, but a graph can make it clear what the dependencies are within your 
+
+## Setup
+
 ### 1. Create A Neo4j Instance
 
 You should be able to run the community edition of Neo4j in Docker (with APOC enabled) with the following:
@@ -19,7 +29,7 @@ Node dependencies need to be installed at the root, in the api/ directory, and i
 
 Run `npm run installAll` which will run `npm install` in each of those locations.
 
-### 2. Start the application
+### 3. Start the application
 
 Add the following information in a file called .env in the api/ directory. Change the values to match your Neo4j instance:
 
@@ -52,7 +62,7 @@ SKIP_PREFLIGHT_CHECK=true npm run start
 
 This will start both the api and web-react-ts apps concurrently.
 
-### 3. Seed the database (optional)
+### 4. Seed the database (optional)
 
 Make sure your application is running locally with `npm run start`, open another terminal and run
 
@@ -60,16 +70,6 @@ Make sure your application is running locally with `npm run start`, open another
 npm run seedDb
 ```
 
-### 4. Open In Browser
+### 5. Open In Browser
 
 Navigate to http://localhost:3000 to open the web frontend or http://localhost:4001/graphql to open the graphql playground.
-
-### [`/web-react-ts`](./web-react-ts)
-
-A UI built with [CRA](https://reactjs.org/docs/create-a-new-react-app.html)
-
-_Start the React dev server_
-
-```
-cd ./web-react-ts && npm start
-```
