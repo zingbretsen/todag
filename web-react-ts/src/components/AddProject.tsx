@@ -30,19 +30,14 @@ const AddProject = ({ setNewProjectData }: setter) => {
 
   return (
     <div>
-      <input
-        type="text"
-        ref={inputRef}
-        onChange={(event) => setNewProjectName(event.target.value)}
-      />
-      <input
-        type="button"
-        value="Add Project"
-        onClick={() => {
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+
           // If project name is entered, create new project via mutation,
           // clear input box,
           // and update new project name in parent component
-          // in case we want to optimistically add the project to our list
+          // so we can optimistically add the project to our list
           if (inputRef.current?.value) {
             let data: projecttype = {
               nextActions: [],
@@ -57,7 +52,14 @@ const AddProject = ({ setNewProjectData }: setter) => {
             setNewProjectData((prevProjects: any[]) => [data, ...prevProjects])
           }
         }}
-      />
+      >
+        <input
+          type="text"
+          ref={inputRef}
+          onChange={(event) => setNewProjectName(event.target.value)}
+        />
+        <input type="submit" value="Add Project" />
+      </form>
     </div>
   )
 }
